@@ -13,6 +13,8 @@ const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
+const backend_url = "https://shiva-smart-services.onrender.com/";
+
 const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
