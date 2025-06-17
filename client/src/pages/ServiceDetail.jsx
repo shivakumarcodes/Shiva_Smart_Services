@@ -5,6 +5,8 @@ import Booking from '../components/Booking';
 import ShareButton from '../components/ShareButton';
 import '../styles/ServiceDetail.css';
 import { BASE_URL } from '../api/axiosInstance';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const ServiceDetail = () => {
   const { id } = useParams();
@@ -22,6 +24,16 @@ const ServiceDetail = () => {
   const [isBooking, setIsBooking] = useState(false);
 
   const placeholderImage = 'https://placehold.co/400x300.png?text=Service+Image&font=roboto';
+
+  useEffect(() => {
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: false,
+      mirror: true
+    });
+  }, []);
 
   const getServiceImage = () => {
     if (service?.images?.length > 0) {
@@ -61,7 +73,6 @@ const ServiceDetail = () => {
 
         const response = await axios.get(`${BASE_URL}/api/services/${id}`);
         setService(response.data);
-        // console.log(response.data);
       } catch (err) {
         setError(err.response?.data?.message || err.message);
         navigate('/services');
@@ -146,7 +157,7 @@ const ServiceDetail = () => {
   return (
     <div className="service-detail-container">
       {/* Service Header */}
-      <div className="service-header">
+      <div className="service-header" data-aos="fade-down">
         <h1>{service.title}</h1>
         <div className="service-meta">
           <span className="price">₹{service.base_price}</span>
@@ -169,7 +180,7 @@ const ServiceDetail = () => {
 
       {/* Main Content */}
       <div className="service-content">
-        <div className="service-image-wrapper">
+        <div className="service-image-wrapper" data-aos="fade-right">
           <img
             src={getServiceImage()}
             alt={service.title}
@@ -182,12 +193,12 @@ const ServiceDetail = () => {
         </div>
 
         <div className="service-info">
-          <div className="info-section">
+          <div className="info-section" data-aos="fade-left" data-aos-delay="100">
             <h3 className="head">Service Description</h3>
             <p className="description">{service.description}</p>
           </div>
 
-          <div className="info-section">
+          <div className="info-section" data-aos="fade-left" data-aos-delay="200">
             <h3 className="head">Service Details</h3>
             <ul className="service-details-list">
               <li><strong>Category:</strong> {service.category}</li>
@@ -199,7 +210,7 @@ const ServiceDetail = () => {
             </ul>
           </div>
 
-          <div className="action-buttons">
+          <div className="action-buttons" data-aos="fade-up" data-aos-delay="300">
             {!bookingSuccess ? (
               <button className="book-button" onClick={handleBookNowClick}>
                 Book Now
@@ -216,8 +227,8 @@ const ServiceDetail = () => {
 
       {/* Provider Section */}
       <div className="provider-section">
-        <h2>About the Provider</h2>
-        <div className="provider-card">
+        <h2 data-aos="fade-down">About the Provider</h2>
+        <div className="provider-card" data-aos="zoom-in">
           <img
             src={getProfilePictureUrl()}
             alt={service.provider_name}
@@ -228,20 +239,20 @@ const ServiceDetail = () => {
             }}
           />
           <div className="provider-info">
-            <h3>{service.provider_name}</h3>
-            <p className="provider-specialty">{service.service_type} Specialist</p>
-            <p className="provider-experience">{service.experience_years} years experience</p>
-            <p className="provider-description">{service.provider_description}</p>
+            <h3 data-aos="fade-right" data-aos-delay="100">{service.provider_name}</h3>
+            <p className="provider-specialty" data-aos="fade-right" data-aos-delay="150">{service.service_type} Specialist</p>
+            <p className="provider-experience" data-aos="fade-right" data-aos-delay="200">{service.experience_years} years experience</p>
+            <p className="provider-description" data-aos="fade-right" data-aos-delay="250">{service.provider_description}</p>
             <div className="provider-stats">
-              <div className="stat-item">
+              <div className="stat-item" data-aos="fade-up" data-aos-delay="300">
                 <span className="stat-value">{service.completed_jobs || 0}+</span>
                 <span className="stat-label">Jobs Done</span>
               </div>
-              <div className="stat-item">
+              <div className="stat-item" data-aos="fade-up" data-aos-delay="350">
                 <span className="stat-value"><span className="stars">★★★★★</span></span>
                 <span className="stat-label">Rating</span>
               </div>
-              <div className="stat-item">
+              <div className="stat-item" data-aos="fade-up" data-aos-delay="400">
                 <span className="stat-value">{service.response_rate || '100'}%</span>
                 <span className="stat-label">Response Rate</span>
               </div>
@@ -252,11 +263,16 @@ const ServiceDetail = () => {
 
       {/* Reviews */}
       <div className="reviews-section">
-        <h2>Customer Reviews</h2>
+        <h2 data-aos="fade-down">Customer Reviews</h2>
         {service.reviews?.length > 0 ? (
           <div className="reviews-list">
-            {service.reviews.map(review => (
-              <div key={review.review_id} className="review-card">
+            {service.reviews.map((review, index) => (
+              <div 
+                key={review.review_id} 
+                className="review-card"
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+              >
                 <div className="review-header">
                   <img
                     src={review.user_image || '/default-avatar.jpg'}
@@ -295,7 +311,7 @@ const ServiceDetail = () => {
             ))}
           </div>
         ) : (
-          <p className="no-reviews">No reviews yet for this service.</p>
+          <p className="no-reviews" data-aos="fade-up">No reviews yet for this service.</p>
         )}
       </div>
 

@@ -4,6 +4,9 @@ import axios from 'axios';
 import { useToast } from '../components/ToastContext';
 import '../styles/ProfilePage.css';
 import { BASE_URL } from '../api/axiosInstance';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import '../styles/MyBookings.css';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState(null);
@@ -11,6 +14,7 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [profileImageError, setProfileImageError] = useState(false);
+  const [showAllBookings, setShowAllBookings] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -20,9 +24,14 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  // const BASE_URL = 'http://localhost:5000';
-
   useEffect(() => {
+    // Initialize AOS
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false
+    });
     fetchProfile();
   }, []);
 
@@ -45,14 +54,13 @@ const ProfilePage = () => {
       });
 
       setProfile(response.data);
-      setProfileImageError(false); // Reset image error when profile loads
+      setProfileImageError(false);
       setFormData({
         name: response.data.name,
         phone: response.data.phone || '',
         profilePicture: null
       });
       
-      // Check provider approval status if applicable
       if (response.data.role === 'provider' && response.data.provider) {
         checkProviderApprovalStatus(response.data.provider);
       }
@@ -73,26 +81,18 @@ const ProfilePage = () => {
     }
   };
   
-  // Handle provider approval status notifications
   const checkProviderApprovalStatus = (provider) => {
-    // Get the previous approval status from localStorage (if any)
     const previousStatus = localStorage.getItem('providerApprovalStatus');
     const currentStatus = provider.is_approved ? 'approved' : 'pending';
     
-    // Store current status for future comparison
     localStorage.setItem('providerApprovalStatus', currentStatus);
     
-    // If this is the first login, just store the status without showing notification
-    if (!previousStatus) {
-      return;
-    }
+    if (!previousStatus) return;
     
-    // If status changed from pending to approved
     if (previousStatus === 'pending' && currentStatus === 'approved') {
       showToast('Congratulations! Your provider account has been approved! You can now start offering services.', 'success', 8000);
     }
     
-    // If status changed from approved to not approved (admin revoked approval - rare case)
     if (previousStatus === 'approved' && currentStatus === 'pending') {
       showToast('Your provider approval status has been changed. Please contact support for more information.', 'warning', 8000);
     }
@@ -114,7 +114,6 @@ const ProfilePage = () => {
         profilePicture: file
       }));
       
-      // Create preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
@@ -138,12 +137,10 @@ const ProfilePage = () => {
       
       const formDataToSend = new FormData();
       
-      // Only append fields that have changed
       if (formData.name !== profile.name) {
         formDataToSend.append('name', formData.name);
       }
       
-      // Phone can be empty string to clear it
       if (formData.phone !== profile.phone) {
         formDataToSend.append('phone', formData.phone);
       }
@@ -152,7 +149,6 @@ const ProfilePage = () => {
         formDataToSend.append('profilePicture', formData.profilePicture);
       }
       
-      // Check if we have anything to update
       if (formDataToSend.entries().next().done) {
         setIsEditing(false);
         setPreviewImage(null);
@@ -167,13 +163,11 @@ const ProfilePage = () => {
         }
       });
       
-      // Update profile with the returned data
       setProfile(response.data);
-      setProfileImageError(false); // Reset image error on successful update
+      setProfileImageError(false);
       setIsEditing(false);
       setPreviewImage(null);
       
-      // Reset form data with new values
       setFormData({
         name: response.data.name,
         phone: response.data.phone || '',
@@ -217,12 +211,9 @@ const ProfilePage = () => {
     }
   };
 
-  // Helper function to get full URL for profile picture
   const getProfilePictureUrl = (url) => {
     if (!url) return null;
-    // If the URL already starts with http or https, return it as is
     if (url.startsWith('http')) return url;
-    // Otherwise, prepend the base API URL
     return `${BASE_URL}${url}`;
   };
 
@@ -232,7 +223,7 @@ const ProfilePage = () => {
 
   if (loading && !profile) {
     return (
-      <div className="loading-container">
+      <div className="loading-container" data-aos="fade-in">
         <div className="loading-spinner"></div>
         <p>Loading your profile...</p>
       </div>
@@ -241,7 +232,7 @@ const ProfilePage = () => {
 
   if (error) {
     return (
-      <div className="error-container">
+      <div className="error-container" data-aos="fade-in">
         <h2>Error</h2>
         <p>{error}</p>
         <button onClick={fetchProfile} className="retry-button">Try Again</button>
@@ -251,7 +242,7 @@ const ProfilePage = () => {
 
   if (!profile) {
     return (
-      <div className="not-found-container">
+      <div className="not-found-container" data-aos="fade-in">
         <h2>Profile Not Found</h2>
         <p>We couldn't find your profile information.</p>
         <button onClick={() => navigate('/login')} className="login-button">Go to Login</button>
@@ -262,9 +253,9 @@ const ProfilePage = () => {
   if (isEditing) {
     return (
       <div className="profile-container">
-        <h2>Edit Profile</h2>
-        <form onSubmit={handleSubmit} className="edit-profile-form">
-          <div className="form-group">
+        <h2 data-aos="fade-down">Edit Profile</h2>
+        <form onSubmit={handleSubmit} className="edit-profile-form" data-aos="fade-up">
+          <div className="form-group" data-aos="fade-right" data-aos-delay="100">
             <label>Name</label>
             <input 
               type="text"
@@ -276,7 +267,7 @@ const ProfilePage = () => {
             />
           </div>
           
-          <div className="form-group">
+          <div className="form-group" data-aos="fade-right" data-aos-delay="150">
             <label>Phone</label>
             <input 
               type="tel"
@@ -287,7 +278,7 @@ const ProfilePage = () => {
             />
           </div>
           
-          <div className="form-group">
+          <div className="form-group" data-aos="fade-right" data-aos-delay="200">
             <label>Profile Picture</label>
             <div className="image-upload-container">
               {(previewImage || profile.profilePicture) && (
@@ -309,7 +300,7 @@ const ProfilePage = () => {
           
           {error && <div className="form-error">{error}</div>}
           
-          <div className="form-actions">
+          <div className="form-actions" data-aos="fade-up" data-aos-delay="250">
             <button 
               type="submit" 
               className="save-button"
@@ -323,7 +314,6 @@ const ProfilePage = () => {
               onClick={() => {
                 setIsEditing(false);
                 setPreviewImage(null);
-                // Reset form data to current profile values
                 setFormData({
                   name: profile.name,
                   phone: profile.phone || '',
@@ -343,38 +333,39 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-container">
-      <div className="profile-header">
+      <div className="profile-header" data-aos="fade-down">
         {profile.profilePicture && !profileImageError ? (
           <img
             src={getProfilePictureUrl(profile.profilePicture)}
             alt={profile.name}
             className="profile-avatar"
             onError={handleProfileImageError}
+            data-aos="zoom-in"
           />
         ) : (
-          <div className="profile-avatar-initial">
+          <div className="profile-avatar-initial" data-aos="zoom-in">
             {getInitial(profile.name)}
           </div>
         )}
-        <h1>{profile.name}</h1>
-        <p className="user-email">{profile.email}</p>
-        {profile.phone && <p className="user-phone">{profile.phone}</p>}
-        <div className="user-status">
+        <h1 data-aos="fade-up" data-aos-delay="100">{profile.name}</h1>
+        <p className="user-email" data-aos="fade-up" data-aos-delay="150">{profile.email}</p>
+        {profile.phone && <p className="user-phone" data-aos="fade-up" data-aos-delay="200">{profile.phone}</p>}
+        <div className="user-status" data-aos="fade-up" data-aos-delay="250">
           <span className={`role-badge ${profile.role}`}>{profile.role}</span>
           {profile.isVerified && <span className="verified-badge">Verified</span>}
         </div>
       </div>
 
       {profile.role === 'provider' && profile.provider && (
-        <div className="provider-info">
+        <div className="provider-info" data-aos="fade-up" data-aos-delay="300">
           <h2>Provider Information</h2>
           <div className="provider-details">
-            <p><strong>Service Type:</strong> {profile.provider.service_type || 'Not specified'}</p>
-            <p><strong>Experience:</strong> {profile.provider.experience_years || 0} years</p>
-            <p><strong>Rating:</strong> {profile.provider.rating ? `${profile.provider.rating}/5` : 'No ratings yet'}</p>
-            <p><strong>Status:</strong> {profile.provider.is_approved ? 'Approved' : 'Pending Approval'}</p>
+            <p data-aos="fade-right" data-aos-delay="350"><strong>Service Type:</strong> {profile.provider.service_type || 'Not specified'}</p>
+            <p data-aos="fade-right" data-aos-delay="400"><strong>Experience:</strong> {profile.provider.experience_years || 0} years</p>
+            <p data-aos="fade-right" data-aos-delay="450"><strong>Rating:</strong> {profile.provider.rating ? `${profile.provider.rating}/5` : 'No ratings yet'}</p>
+            <p data-aos="fade-right" data-aos-delay="500"><strong>Status:</strong> {profile.provider.is_approved ? 'Approved' : 'Pending Approval'}</p>
             {profile.provider.description && (
-              <div className="provider-description">
+              <div className="provider-description" data-aos="fade-up" data-aos-delay="550">
                 <h3>About</h3>
                 <p>{profile.provider.description}</p>
               </div>
@@ -382,11 +373,16 @@ const ProfilePage = () => {
           </div>
 
           {profile.provider.services && profile.provider.services.length > 0 && (
-            <div className="provider-services">
+            <div className="provider-services" data-aos="fade-up" data-aos-delay="600">
               <h3>My Services</h3>
               <div className="services-grid">
-                {profile.provider.services.map(service => (
-                  <div key={service.service_id} className="service-card">
+                {profile.provider.services.map((service, index) => (
+                  <div 
+                    key={service.service_id} 
+                    className="service-card"
+                    data-aos="fade-up"
+                    data-aos-delay={100 + (index * 100)}
+                  >
                     {service.primary_image_url && (
                       <img 
                         src={getProfilePictureUrl(service.primary_image_url)} 
@@ -411,33 +407,46 @@ const ProfilePage = () => {
       )}
 
       {profile.bookings && profile.bookings.length > 0 && (
-        <div className="bookings-section">
-          <h2>My Bookings</h2>
-          <div className="bookings-list">
-            {profile.bookings.map(booking => (
-              <div key={booking.booking_id} className="booking-card">
-                <div className="booking-header">
-                  <h3>{booking.service_title || 'Unknown Service'}</h3>
-                  <span className={`booking-status ${getStatusBadgeClass(booking.status)}`}>
-                    {booking.status || 'pending'}
-                  </span>
-                </div>
-                <div className="booking-details">
-                  <p><strong>Provider:</strong> {booking.provider_name || 'Unknown Provider'}</p>
-                  <p><strong>Date:</strong> {formatDate(booking.booking_date)}</p>
-                  <p><strong>Address:</strong> {booking.address || 'Not specified'}</p>
-                  <p><strong>Amount:</strong> ₹{booking.total_amount?.toFixed(2) || '0.00'}</p>
-                  <p><strong>Payment:</strong> 
-                    <span className={`payment-status ${booking.payment_status || 'pending'}`}>
-                      {booking.payment_status || 'pending'}
+          <div className="bookings-section">
+            <h2>My Bookings</h2>
+            <div className="bookings-list">
+              {profile.bookings.slice(0, showAllBookings ? profile.bookings.length : 4).map((booking, index) => (
+                <div 
+                  key={booking.booking_id} 
+                  className="booking-card"
+                  data-aos="fade-up"
+                  data-aos-delay={500 + (index * 5)}
+                >
+                  <div className="booking-header">
+                    <h3>{booking.service_title || 'Unknown Service'}</h3>
+                    <span className={`booking-status ${getStatusBadgeClass(booking.status)}`}>
+                      {booking.status || 'pending'}
                     </span>
-                  </p>
+                  </div>
+                  <div className="booking-details">
+                    <p><strong>Provider:</strong> {booking.provider_name || 'Unknown Provider'}</p>
+                    <p><strong>Date:</strong> {formatDate(booking.booking_date)}</p>
+                    <p><strong>Address:</strong> {booking.address || 'Not specified'}</p>
+                    <p><strong>Amount:</strong> ₹{booking.total_amount?.toFixed(2) || '0.00'}</p>
+                    <p><strong>Payment:</strong> 
+                      <span className={`payment-status ${booking.payment_status || 'pending'}`}>
+                        {booking.payment_status || 'pending'}
+                      </span>
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {profile.bookings.length > 4 && (
+              <button 
+                className="show-all-btn" 
+                onClick={() => setShowAllBookings(!showAllBookings)}
+              >
+                {showAllBookings ? 'Show Less' : 'Show All'}
+              </button>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
       <div className="profile-actions">
         <button 

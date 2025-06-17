@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { BASE_URL } from '../api/axiosInstance';
 import '../styles/Navbar.css';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -15,14 +17,21 @@ const Navbar = () => {
   const location = useLocation();
   const dropdownRef = useRef(null);
 
-  // const BASE_URL = 'http://localhost:5000';
+  useEffect(() => {
+    // Initialize AOS for navbar animations
+    AOS.init({
+      duration: 500,
+      easing: 'ease-out',
+      once: true,
+      mirror: false
+    });
+  }, []);
 
   useEffect(() => {
     // Close mobile menu when route changes
     setIsMobileMenuOpen(false);
   }, [location]);
 
-  // Create a memoized fetchProfile function using useCallback
   const fetchProfile = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -33,11 +42,10 @@ const Navbar = () => {
           }
         });
         setProfile(response.data);
-        setImageError(false); // Reset image error when profile updates
+        setImageError(false);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      // If token is invalid, log user out
       if (error.response?.status === 401) {
         logout();
       }
@@ -45,17 +53,14 @@ const Navbar = () => {
   }, [user, logout]);
 
   useEffect(() => {
-    // Only fetch profile when user is logged in
     if (user) {
       fetchProfile();
     } else {
-      // Clear profile when user logs out
       setProfile(null);
       setImageError(false);
     }
-  }, [user, location.pathname, fetchProfile]); // Add location dependency to trigger refetch on navigation
+  }, [user, location.pathname, fetchProfile]);
 
-  // Add event listener to close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -63,12 +68,10 @@ const Navbar = () => {
       }
     };
 
-    // Add event listener if dropdown is open
     if (isDropdownOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
-    // Clean up event listener on unmount or when dropdown closes
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -86,16 +89,13 @@ const Navbar = () => {
     return location.pathname === path ? 'active' : '';
   };
 
-  // Get profile picture URL with proper handling
   const getProfilePictureUrl = () => {
-    // First check profile from API
     if (profile?.profilePicture) {
       return profile.profilePicture.startsWith('http')
         ? profile.profilePicture
         : `${BASE_URL}${profile.profilePicture}`;
     }
     
-    // Fallback to user info from auth context
     if (user?.profile_picture_url) {
       return user.profile_picture_url.startsWith('http')
         ? user.profile_picture_url
@@ -106,14 +106,12 @@ const Navbar = () => {
   };
 
   const getUserInitial = () => {
-    // Function to extract initials from a name
     const getInitialsFromName = (name) => {
       if (!name || typeof name !== 'string') return 'U';
       
       const nameParts = name.trim().split(' ');
       let initials = nameParts[0].charAt(0).toUpperCase();
       
-      // Add last initial if available
       if (nameParts.length > 1) {
         initials += nameParts[nameParts.length - 1].charAt(0).toUpperCase();
       }
@@ -121,19 +119,15 @@ const Navbar = () => {
       return initials;
     };
     
-    // Try profile from API first
     if (profile?.name) {
       return getInitialsFromName(profile.name);
     }
     
-    // Fall back to user from auth context
     if (user?.name) {
       return getInitialsFromName(user.name);
     }
     
-    // If user exists but has no name property
     if (user) {
-      // Try to use email or username if available
       if (user.email) {
         return user.email.charAt(0).toUpperCase();
       }
@@ -142,32 +136,27 @@ const Navbar = () => {
       }
     }
     
-    return 'U'; // Ultimate fallback
+    return 'U';
   };
 
-  // Get display name with comprehensive fallbacks
   const getDisplayName = () => {
-    // Try profile from API first
     if (profile?.name) {
       return profile.name;
     }
     
-    // Fall back to user from auth context
     if (user?.name) {
       return user.name;
     }
     
-    // Try other user properties
     if (user) {
       if (user.username) return user.username;
       if (user.email) {
-        // Return email without domain if possible
         const emailParts = user.email.split('@');
         return emailParts[0] || user.email;
       }
     }
     
-    return 'User'; // Ultimate fallback
+    return 'User';
   };
 
   const handleImageError = () => {
@@ -175,9 +164,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" data-aos="fade-down">
       <div className="nav-container">
-        <Link to="/" className="logo">
+        <Link to="/" className="logo" data-aos="fade-right" data-aos-delay="100">
           <svg className="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L3 7L12 12L21 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M3 17L12 22L21 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -190,6 +179,8 @@ const Navbar = () => {
           className="menu-toggle" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label="Toggle menu"
+          data-aos="fade-left"
+          data-aos-delay="100"
         >
           {isMobileMenuOpen ? (
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -206,12 +197,38 @@ const Navbar = () => {
         </button>
 
         <div className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
-          <Link to="/" className={isActive('/')}>Home</Link>
-          <Link to="/services" className={isActive('/services')}>Services</Link>
-          <Link to="/about" className={isActive('/about')}>About Us</Link>
+          <Link 
+            to="/" 
+            className={isActive('/')}
+            data-aos="fade-down" 
+            data-aos-delay="200"
+          >
+            Home
+          </Link>
+          <Link 
+            to="/services" 
+            className={isActive('/services')}
+            data-aos="fade-down" 
+            data-aos-delay="250"
+          >
+            Services
+          </Link>
+          <Link 
+            to="/about" 
+            className={isActive('/about')}
+            data-aos="fade-down" 
+            data-aos-delay="300"
+          >
+            About Us
+          </Link>
           
           {user ? (
-            <div className="profile-menu" ref={dropdownRef}>
+            <div 
+              className="profile-menu" 
+              ref={dropdownRef}
+              data-aos="fade-down" 
+              data-aos-delay="350"
+            >
               <button 
                 className="profile-button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -246,7 +263,7 @@ const Navbar = () => {
               </button>
               
               {isDropdownOpen && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
                   <Link 
                     to="/profile" 
                     className="dropdown-item"
@@ -302,7 +319,12 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className={`login-button ${isActive('/login')}`}>
+            <Link 
+              to="/login" 
+              className={`login-button ${isActive('/login')}`}
+              data-aos="fade-down" 
+              data-aos-delay="350"
+            >
               Login
             </Link>
           )}

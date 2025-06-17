@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Services.css';
 import { BASE_URL } from '../api/axiosInstance';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export default function CategorySeparatePage() {
   const [services, setServices] = useState([]);
@@ -12,8 +14,6 @@ export default function CategorySeparatePage() {
   const { categoryName } = useParams();
   const navigate = useNavigate();
 
-  // const BASE_URL = 'http://localhost:5000';
-  
   // Pagination state
   const ITEMS_PER_PAGE = 8;
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,6 +21,16 @@ export default function CategorySeparatePage() {
   const [totalItems, setTotalItems] = useState(0);
   
   const formattedCategoryName = categoryName;
+
+  // Initialize AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 150,
+      easing: 'ease-in-out',
+      once: true,
+      mirror: false
+    });
+  }, []);
 
   // Update displayed services based on current page
   const updateDisplayedServices = (servicesData, page) => {
@@ -38,7 +48,6 @@ export default function CategorySeparatePage() {
         const response = await axios.get(`${BASE_URL}/api/services?category=${formattedCategoryName}`);
         const servicesData = response.data.services || [];
         setServices(servicesData);
-        // console.log(servicesData);
         updateDisplayedServices(servicesData, 1);
       } catch (err) {
         setError(err.message || 'Failed to fetch services');
@@ -67,16 +76,16 @@ export default function CategorySeparatePage() {
   };
 
   const getPrimaryImage = (service) => {
-  const placeholderImage = 'https://placehold.co/400x300.png?text=Service+Image&font=roboto';
+    const placeholderImage = 'https://placehold.co/400x300.png?text=Service+Image&font=roboto';
 
-  if (service?.primary_image_url) {
-    return service.primary_image_url.startsWith('http')
-      ? service.primary_image_url
-      : `${BASE_URL}${service.primary_image_url}`;
-  }
+    if (service?.primary_image_url) {
+      return service.primary_image_url.startsWith('http')
+        ? service.primary_image_url
+        : `${BASE_URL}${service.primary_image_url}`;
+    }
 
-  return 'https://placehold.co/400x300.png?text=Service+Image&font=roboto';
-};
+    return placeholderImage;
+  };
 
   const formatPrice = (price) => {
     const numericPrice = Number(price);
@@ -139,7 +148,7 @@ export default function CategorySeparatePage() {
     }
 
     return (
-      <div className="pagination">
+      <div className="pagination" data-aos="fade-up">
         <button 
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -185,7 +194,7 @@ export default function CategorySeparatePage() {
     return (
       <div className="services-page">
         <div className="div-container">
-          <h1 className="categories-title">Loading {formattedCategoryName} services...</h1>
+          <h1 className="categories-title" data-aos="fade-down">Loading {formattedCategoryName} services...</h1>
           <div className="loading" aria-live="polite">Loading services...</div>
         </div>
       </div>
@@ -196,9 +205,15 @@ export default function CategorySeparatePage() {
     return (
       <div className="services-page">
         <div className="div-container">
-          <h1 className="categories-title">{formattedCategoryName.toUpperCase()} SERVICES</h1>
-          <p className="error-message">Error: {error}</p>
-          <button onClick={() => window.location.reload()}>Try Again</button>
+          <h1 className="categories-title" data-aos="fade-down">{formattedCategoryName.toUpperCase()} SERVICES</h1>
+          <p className="error-message" data-aos="fade-up">Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );
@@ -207,15 +222,15 @@ export default function CategorySeparatePage() {
   return (
     <div className="services-page">
       <div className="div-container">
-        <h1 className="categories-title">{formattedCategoryName.toUpperCase()} SERVICES</h1>
-        <p className="category-description">
+        <h1 className="categories-title" data-aos="fade-down">{formattedCategoryName.toUpperCase()} SERVICES</h1>
+        <p className="category-description" data-aos="fade-up" data-aos-delay="100">
           Browse our top-rated {formattedCategoryName.toLowerCase()} professionals
         </p>
       </div>
 
       <div className="service-grid">
         {displayedServices.length > 0 ? (
-          displayedServices.map(service => (
+          displayedServices.map((service, index) => (
             <article 
               key={service.service_id} 
               className="service-card"
@@ -224,6 +239,8 @@ export default function CategorySeparatePage() {
               role="button"
               aria-label={`Service: ${service.title}`}
               onKeyDown={(e) => e.key === 'Enter' && handleServiceClick(service.service_id)}
+              data-aos="fade-up"
+              data-aos-delay={(index % 4) * 100} // Stagger animation based on column
             >
               <div className="service-image">
                 <img 
@@ -246,7 +263,7 @@ export default function CategorySeparatePage() {
             </article>
           ))
         ) : (
-          <p className="no-results">No services found in this category.</p>
+          <p className="no-results" data-aos="fade-up">No services found in this category.</p>
         )}
       </div>
       

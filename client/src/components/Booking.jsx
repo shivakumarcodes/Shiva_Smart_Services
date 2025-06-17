@@ -225,7 +225,7 @@ const Booking = ({
         totalAmount: parseFloat(service.base_price)
       };
 
-      console.log('Submitting booking with data:', bookingData);
+      // console.log('Submitting booking with data:', bookingData);
 
       if (paymentMethod === 'online') {
         setIsProcessingPayment(true);
@@ -327,7 +327,7 @@ const Booking = ({
   return ReactDOM.createPortal(
     <div className="booking-overlay" onClick={() => setShowBookingForm(false)}>
       <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={() => setShowBookingForm(false)}>×</button>
+        {/* <button className="close-btn" onClick={() => setShowBookingForm(false)}>×</button> */}
         
         <div className="booking-modal-header">
           <h3>Book This Service</h3>

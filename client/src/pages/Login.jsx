@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/Login.css';
 import { BASE_URL } from '../api/axiosInstance';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -16,8 +18,15 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // const BASE_URL = 'http://localhost:5000';
-  
+  // Initialize AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  }, []);
+
   // Guest login credentials
   const guestCredentials = {
     user: { email: 'user@gmail.com', password: 'password123' },
@@ -87,16 +96,41 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
+      <div 
+        className="login-card"
+        data-aos="fade-up"
+        data-aos-delay="100"
+      >
+        <div 
+          className="login-header"
+          data-aos="fade-in"
+          data-aos-delay="300"
+        >
           <h2>Welcome Back</h2>
           <p>Log in to access your account</p>
         </div>
                 
-        {errors.api && <div className="error-message">{errors.api}</div>}
+        {errors.api && (
+          <div 
+            className="error-message"
+            data-aos="fade-in"
+            data-aos-delay="400"
+          >
+            {errors.api}
+          </div>
+        )}
                 
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
+        <form 
+          onSubmit={handleSubmit} 
+          className="login-form"
+          data-aos="fade-in"
+          data-aos-delay="500"
+        >
+          <div 
+            className="form-group"
+            data-aos="fade-right"
+            data-aos-delay="600"
+          >
             <label htmlFor="email">Email Address</label>
             <input
               type="email"
@@ -109,7 +143,11 @@ const Login = () => {
             {errors.email && <span className="error-text">{errors.email}</span>}
           </div>
                     
-          <div className="form-group">
+          <div 
+            className="form-group"
+            data-aos="fade-right"
+            data-aos-delay="700"
+          >
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -122,14 +160,12 @@ const Login = () => {
             {errors.password && <span className="error-text">{errors.password}</span>}
           </div>
                     
-          {/* <div className="forgot-password">
-            <Link to="/forgot-password">Forgot password?</Link>
-          </div> */}
-                    
           <button 
             type="submit"
             className="login-button"
             disabled={isSubmitting}
+            data-aos="zoom-in"
+            data-aos-delay="700"
           >
             {isSubmitting ? 'Logging In...' : 'Log In'}
           </button>
@@ -146,8 +182,16 @@ const Login = () => {
 
         {/* Guest Login Modal */}
         {showGuestModal && (
-          <div className="modal-overlay" onClick={() => setShowGuestModal(false)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div 
+            className="modal-overlay" 
+            onClick={() => setShowGuestModal(false)}
+            data-aos="fade-in"
+          >
+            <div 
+              className="modal-content" 
+              onClick={(e) => e.stopPropagation()}
+              data-aos="zoom-in"
+            >
               <div className="modal-header">
                 <h3>Select Guest Login Type</h3>
                 <button 
@@ -162,6 +206,8 @@ const Login = () => {
                   className="guest-option-button"
                   onClick={() => handleGuestLogin('user')}
                   disabled={isSubmitting}
+                  data-aos="fade-up"
+                  data-aos-delay="100"
                 >
                   Login as User
                 </button>
@@ -169,6 +215,8 @@ const Login = () => {
                   className="guest-option-button"
                   onClick={() => handleGuestLogin('provider')}
                   disabled={isSubmitting}
+                  data-aos="fade-up"
+                  data-aos-delay="200"
                 >
                   Login as Provider
                 </button>
@@ -176,6 +224,8 @@ const Login = () => {
                   className="guest-option-button"
                   onClick={() => handleGuestLogin('admin')}
                   disabled={isSubmitting}
+                  data-aos="fade-up"
+                  data-aos-delay="300"
                 >
                   Login as Admin
                 </button>
@@ -184,7 +234,9 @@ const Login = () => {
           </div>
         )}
                 
-        <div className="register-link">
+        <div 
+          className="register-link"
+        >
           Don't have an account? <Link to="/register">Sign up</Link>
         </div>
       </div>

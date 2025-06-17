@@ -4,16 +4,21 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.jsx';
 import './index.css';
 
-const router = createBrowserRouter([
+// Define routes
+const routes = [
   {
-    path: "/*",
+    path: '/*',
     element: <App />,
-    future: {
-      v7_startTransition: true,
-      v7_relativeSplatPath: true
-    }
-  }
-]);
+  },
+];
+
+// Create the router with future flags
+const router = createBrowserRouter(routes, {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+  },
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>

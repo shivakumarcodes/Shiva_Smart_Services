@@ -10,6 +10,11 @@
   border-radius: 15px;
 }
 
+.loading{
+  background-color: #f0f0f0;
+  width: 400px;
+}
+
 .services-browser-container {
   position: relative;
   padding: 4rem;
@@ -17,6 +22,7 @@
   overflow: hidden;
   background-color: #f9f9ff;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(19, 71, 53, 0.649);
 }
 
 .doodle-bg {
@@ -82,6 +88,8 @@
   position: relative;
   flex: 1;
   min-width: 250px;
+  box-shadow: 0 0 0 3px rgba(19, 71, 53, 0.649);
+  border-radius: 10px;
 }
 
 .search-icon, .location-icon {
@@ -192,7 +200,7 @@
 
 .services-page .search-bar input:focus {
   outline: none;
-  border-color: #16a085; /* Primary color */
+  /* border-color: #16a085; */
   box-shadow: 0 0 0 3px rgba(22, 160, 133, 0.2);
 }
 
@@ -264,6 +272,7 @@
   background-position: right 0.8rem center;
   background-size: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(22, 26, 25, 0.649);
 }
 
 .services-page .filter-group select:focus {
@@ -286,7 +295,7 @@
 /* 🧩 Service Grid */
 .services-page .service-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-top: 1rem;
   width: 100%;

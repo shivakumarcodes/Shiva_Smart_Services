@@ -41,6 +41,10 @@
   margin-bottom: 0.5rem;
 }
 
+input{
+  box-shadow: 0 0 0 3px rgba(50, 142, 110, 0.2);
+}
+
 .search-input {
   width: 100%;
   padding: 0.875rem 1rem;
@@ -48,7 +52,7 @@
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: all 0.2s ease;
-  background-color: #f9fafb;
+  background-color: #142f4a;
 }
 
 .search-input:focus {
@@ -91,7 +95,7 @@
 }
 
 .search-button:hover {
-  background-color: #67AE6E; /* Updated for primary-light */
+  background-color: #2aa379; /* Updated for primary-light */
   transform: translateY(-1px);
 }
 
