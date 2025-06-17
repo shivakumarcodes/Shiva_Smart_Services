@@ -188,7 +188,7 @@
   padding: 12px;
   margin-left: 7px;
   margin-top: 10px;
-  background-color: rgb(219, 85, 17);
+  background-color: rgb(175, 8, 8);
   color: white;
   border: none;
   border-radius: 6px;
@@ -199,7 +199,9 @@
 }
 
 .guest-login-button:hover:not(:disabled) {
-  background-color: rgb(169, 8, 8);
+  background-color: rgb(190, 8, 8);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .guest-login-button:disabled {

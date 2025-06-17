@@ -12,7 +12,7 @@ const ShareButton = ({ service }) => {
   };
 
   const getShareText = () => {
-    return `Check out this amazing service: ${service?.title} by ${service?.provider_name} - Only $${service?.base_price}!`;
+    return `Check out this amazing service: ${service?.title} by ${service?.provider_name} - Only ₹${service?.base_price}!`;
   };
 
   const handleShareClick = () => {

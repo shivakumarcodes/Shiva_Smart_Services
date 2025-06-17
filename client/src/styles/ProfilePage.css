@@ -355,6 +355,7 @@
   justify-content: center;
   height: 300px;
   text-align: center;
+  background-color: #ddd;
 }
 
 .loading-spinner {
