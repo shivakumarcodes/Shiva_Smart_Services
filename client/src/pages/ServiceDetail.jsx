@@ -209,7 +209,7 @@ const ServiceDetail = () => {
                 <p>✓ Booking successful! Redirecting to your bookings...</p>
               </div>
             )}
-            <ShareButton />
+            <ShareButton service={service} />
           </div>
         </div>
       </div>
