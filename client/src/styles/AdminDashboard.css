@@ -71,7 +71,7 @@
   display: flex;
   flex-direction: column;
   position: fixed;
-  top: 70px;
+  top: 80px;
   left: 0;
   height: calc(100vh - 70px);
   z-index: 99;
@@ -84,6 +84,7 @@
 }
 
 .sidebar-header {
+  /* margin-top: 80px; */
   padding: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -658,4 +659,24 @@ tr:hover {
   .activity-icon {
     margin-bottom: 10px;
   }
+}
+
+.view-more-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.view-more-btn {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.view-more-btn:hover {
+  background-color: #45a049;
 }

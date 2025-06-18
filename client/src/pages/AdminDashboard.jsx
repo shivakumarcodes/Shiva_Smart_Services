@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -6,26 +5,15 @@ import '../styles/AdminDashboard.css';
 import { useToast } from '../components/ToastContext';
 import { BASE_URL } from '../api/axiosInstance';
 
-// Icons
-import { 
-  FiUsers, 
-  FiSettings, 
-  FiLogOut, 
-  FiMenu, 
-  FiX, 
-  FiPieChart, 
-  FiShoppingBag, 
-  FiMessageSquare,
-  FiCheck,
-  FiXCircle,
-  FiEdit2,
-  FiTrash2,
-  FiUserCheck,
-  FiDollarSign
-} from 'react-icons/fi';
+import Sidebar from '../components/AdminDashboard/Sidebar';
+import TopBar from '../components/AdminDashboard/TopBar';
+import DashboardContent from '../components/AdminDashboard/DashboardContent';
+import UsersContent from '../components/AdminDashboard/UsersContent';
+import ProvidersContent from '../components/AdminDashboard/ProvidersContent';
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [visibleUsers, setVisibleUsers] = useState(10);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [users, setUsers] = useState([]);
   const [pendingProviders, setPendingProviders] = useState([]);
@@ -35,8 +23,6 @@ const AdminDashboard = () => {
     pendingApprovals: 0,
     totalRevenue: 0
   });
-
-  // const BASE_URL = 'http://localhost:5000';
 
   const [loading, setLoading] = useState({
     dashboard: true,
@@ -73,7 +59,7 @@ const AdminDashboard = () => {
         setLoading(prev => ({ ...prev, providers: false }));
       }
 
-      // Calculate stats (client-side for now - you might want to create a stats endpoint)
+      // Calculate stats
       if (activeTab === 'dashboard') {
         const [usersRes, providersRes] = await Promise.all([
           axios.get(`${BASE_URL}/api/admin/users`, config),
@@ -88,7 +74,7 @@ const AdminDashboard = () => {
           totalUsers,
           totalProviders,
           pendingApprovals,
-          totalRevenue: 0 // You'll need to implement revenue calculation
+          totalRevenue: 0
         });
         setLoading(prev => ({ ...prev, dashboard: false }));
       }
@@ -107,8 +93,6 @@ const AdminDashboard = () => {
   const approveProvider = async (providerId) => {
     try {
       const token = localStorage.getItem('token');
-      
-      // Find provider to reference in toast message
       const provider = pendingProviders.find(p => p.provider_id === providerId);
       const providerName = provider ? provider.name : 'Provider';
       
@@ -118,17 +102,14 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // Show success toast
       showToast(`${providerName} has been approved successfully!`, 'success');
       
-      // Refresh the pending providers list
       const providersRes = await axios.get(
         `${BASE_URL}/api/admin/providers/pending`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPendingProviders(providersRes.data);
       
-      // Update stats
       setStats(prev => ({
         ...prev,
         pendingApprovals: prev.pendingApprovals - 1,
@@ -141,11 +122,9 @@ const AdminDashboard = () => {
     }
   };
 
-    const rejectProvider = async (providerId) => {
+  const rejectProvider = async (providerId) => {
     try {
       const token = localStorage.getItem('token');
-      
-      // Find provider to reference in toast message
       const provider = pendingProviders.find(p => p.provider_id === providerId);
       const providerName = provider ? provider.name : 'Provider';
       
@@ -154,17 +133,14 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // Show warning toast
       showToast(`${providerName} has been rejected.`, 'warning');
       
-      // Refresh the pending providers list
       const providersRes = await axios.get(
         `${BASE_URL}/api/admin/providers/pending`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setPendingProviders(providersRes.data);
       
-      // Update stats
       setStats(prev => ({
         ...prev,
         pendingApprovals: prev.pendingApprovals - 1
@@ -180,6 +156,10 @@ const AdminDashboard = () => {
     localStorage.removeItem('token');
     showToast('Logged out successfully', 'info');
     navigate('/login');
+  };
+
+  const showMoreUsers = () => {
+    setVisibleUsers(prev => prev + 10);
   };
 
   useEffect(() => {
@@ -219,338 +199,50 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'users':
         return (
-          <div className="content-section">
-            <h2>User Management</h2>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => (
-                    <tr key={user.user_id}>
-                      <td>{user.user_id.substring(0, 8)}...</td>
-                      <td>
-                        <div className="user-cell">
-                          {user.profile_picture_url && (
-                            <img 
-                              src={user.profile_picture_url} 
-                              alt={user.name}
-                              onError={(e) => {
-                                e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
-                              }}
-                            />
-                          )}
-                          {user.name}
-                        </div>
-                      </td>
-                      <td>{user.email}</td>
-                      <td>{user.phone || 'N/A'}</td>
-                      <td><span className={`role-badge ${user.role}`}>{user.role}</span></td>
-                      <td>
-                        <span className={`status-badge ${user.is_verified ? 'active' : 'inactive'}`}>
-                          {user.is_verified ? 'Verified' : 'Pending'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <UsersContent 
+            users={users} 
+            visibleUsers={visibleUsers} 
+            showMoreUsers={showMoreUsers} 
+          />
         );
-      
       case 'providers':
         return (
-          <div className="content-section">
-            <h2>Pending Provider Approvals ({pendingProviders.length})</h2>
-            {pendingProviders.length > 0 ? (
-              <div className="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Provider ID</th>
-                      <th>User</th>
-                      <th>Service Type</th>
-                      <th>Experience</th>
-                      <th>Registered</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingProviders.map(provider => (
-                      <tr key={provider.provider_id}>
-                        <td>{provider.provider_id.substring(0, 8)}...</td>
-                        <td>
-                          <div className="user-cell">
-                            {provider.profile_picture_url && (
-                              <img 
-                                src={provider.profile_picture_url} 
-                                alt={provider.name}
-                                onError={(e) => {
-                                  e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
-                                }}
-                              />
-                            )}
-                            <div>
-                              <strong>{provider.name}</strong>
-                              <small>{provider.email}</small>
-                            </div>
-                          </div>
-                        </td>
-                        <td>{provider.service_type}</td>
-                        <td>{provider.experience_years || 0} years</td>
-                        <td>{new Date(provider.created_at).toLocaleDateString()}</td>
-                        <td>
-                          <button 
-                            className="action-btn approve"
-                            onClick={() => approveProvider(provider.provider_id)}
-                          >
-                            <FiCheck /> Approve
-                          </button>
-                          <button 
-                            className="action-btn reject"
-                            onClick={() => rejectProvider(provider.provider_id)}
-                          >
-                            <FiXCircle /> Reject
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="no-data">
-                <p>No pending provider approvals</p>
-              </div>
-            )}
-          </div>
+          <ProvidersContent 
+            pendingProviders={pendingProviders} 
+            approveProvider={approveProvider} 
+            rejectProvider={rejectProvider} 
+          />
         );
-      
-      case 'settings':
+      default:
         return (
-          <div className="content-section">
-            <h2>System Settings</h2>
-            <div className="settings-form">
-              <div className="form-group">
-                <label>Site Name</label>
-                <input type="text" defaultValue="Smart Services" />
-              </div>
-              <div className="form-group">
-                <label>Maintenance Mode</label>
-                <select>
-                  <option value="false">Disabled</option>
-                  <option value="true">Enabled</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Default User Role</label>
-                <select>
-                  <option value="user">User</option>
-                  <option value="provider">Provider</option>
-                </select>
-              </div>
-              <button 
-                className="save-btn"
-                onClick={() => showToast('Settings saved successfully!', 'success')}
-              >
-                Save Settings
-              </button>
-            </div>
-          </div>
-        );
-      
-      default: // Dashboard
-        return (
-          <div className="content-section">
-            <h2>Dashboard Overview</h2>
-            <div className="stats-cards">
-              <div className="stat-card">
-                <div className="stat-icon users">
-                  <FiUsers />
-                </div>
-                <div className="stat-info">
-                  <h3>Total Users</h3>
-                  <p>{stats.totalUsers}</p>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon providers">
-                  <FiUserCheck />
-                </div>
-                <div className="stat-info">
-                  <h3>Providers</h3>
-                  <p>{stats.totalProviders}</p>
-                </div>
-              </div>
-              {/* <div className="stat-card">
-                <div className="stat-icon revenue">
-                  <FiDollarSign />
-                </div>
-                <div className="stat-info">
-                  <h3>Total Revenue</h3>
-                  <p>${stats.totalRevenue.toLocaleString()}</p>
-                </div>
-              </div> */}
-              <div className="stat-card">
-                <div className="stat-icon pending">
-                  <FiUsers />
-                </div>
-                <div className="stat-info">
-                  <h3>Pending Approvals</h3>
-                  <p>{stats.pendingApprovals}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="recent-activity">
-              <div className="section-header">
-                <h3>Recent Pending Providers</h3>
-                {pendingProviders.length > 0 && (
-                  <button 
-                    className="view-all-btn"
-                    onClick={() => setActiveTab('providers')}
-                  >
-                    View All
-                  </button>
-                )}
-              </div>
-              
-              {pendingProviders.length > 0 ? (
-                <div className="activity-list">
-                  {pendingProviders.slice(0, 3).map(provider => (
-                    <div className="activity-item" key={provider.provider_id}>
-                      <div className="activity-icon">
-                        <FiUserCheck />
-                      </div>
-                      <div className="activity-content">
-                        <p>
-                          <strong>{provider.name}</strong> - {provider.service_type} 
-                          {provider.experience_years && ` (${provider.experience_years} years experience)`}
-                        </p>
-                        <small>Registered on {new Date(provider.created_at).toLocaleDateString()}</small>
-                      </div>
-                      <div className="activity-actions">
-                        <button 
-                          className="action-btn approve"
-                          onClick={() => approveProvider(provider.provider_id)}
-                        >
-                          <FiCheck />
-                        </button>
-                        <button 
-                          className="action-btn reject"
-                          onClick={() => rejectProvider(provider.provider_id)}
-                        >
-                          <FiXCircle />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="no-data">
-                  <p>No recent pending providers</p>
-                </div>
-              )}
-            </div>
-          </div>
+          <DashboardContent 
+            stats={stats} 
+            pendingProviders={pendingProviders} 
+            setActiveTab={setActiveTab} 
+            approveProvider={approveProvider} 
+            rejectProvider={rejectProvider} 
+          />
         );
     }
   };
 
   return (
     <div className="admin-dashboard">
-      {/* Top Navigation Bar */}
-      <header className="top-bar">
-        <button className="toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          {sidebarOpen ? <FiX /> : <FiMenu />}
-        </button>
-        <h1>
-          {activeTab === 'dashboard' ? 'Dashboard' : 
-           activeTab === 'providers' ? 'Provider Approvals' : 
-           activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-        </h1>
-        <div className="user-profile">
-          <img 
-            src="https://res.cloudinary.com/do5aecy6u/image/upload/v1748090371/smart-services-users/af1uegbuurdbnffzu3ie.jpg" 
-            alt="Admin"
-            onError={(e) => {
-              e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
-            }}
-          />
-          <span>Admin</span>
-        </div>
-      </header>
+      <TopBar 
+        activeTab={activeTab} 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
+      />
+      
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen} 
+        stats={stats} 
+        handleLogout={handleLogout} 
+      />
 
-      {/* Sidebar - Now positioned below the top bar */}
-      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <h2>SmartServices</h2>
-        </div>
-        <nav className="sidebar-nav">
-          <ul>
-            <li 
-              className={activeTab === 'dashboard' ? 'active' : ''} 
-              onClick={() => {
-                setActiveTab('dashboard');
-                setSidebarOpen(false);
-              }}
-            >
-              <FiPieChart />
-              <span>Dashboard</span>
-            </li>
-            <li 
-              className={activeTab === 'users' ? 'active' : ''} 
-              onClick={() => {
-                setActiveTab('users');
-                setSidebarOpen(false);
-              }}
-            >
-              <FiUsers />
-              <span>Users</span>
-            </li>
-            <li 
-              className={activeTab === 'providers' ? 'active' : ''} 
-              onClick={() => {
-                setActiveTab('providers');
-                setSidebarOpen(false);
-              }}
-            >
-              <FiUserCheck />
-              <span>Provider Approvals</span>
-              {stats.pendingApprovals > 0 && (
-                <span className="badge">{stats.pendingApprovals}</span>
-              )}
-            </li>
-            {/* <li 
-              className={activeTab === 'settings' ? 'active' : ''} 
-              onClick={() => {
-                setActiveTab('settings');
-                setSidebarOpen(false);
-              }}
-            >
-              <FiSettings />
-              <span>Settings</span>
-            </li> */}
-          </ul>
-        </nav>
-        <div className="sidebar-footer">
-          <button className="logout-btn" onClick={handleLogout}>
-            <FiLogOut />
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
       <div className="main-content">
         {renderContent()}
       </div>
