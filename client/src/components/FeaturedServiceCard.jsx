@@ -71,7 +71,7 @@ const FeaturedServiceCard = ({
           className="provider-photo"
           loading="lazy"
           onError={(e) => {
-            e.target.src = '/default-avatar.jpg';
+            e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
             e.target.alt = 'Default provider avatar';
           }}
         />

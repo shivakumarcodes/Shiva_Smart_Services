@@ -4,6 +4,8 @@ import 'aos/dist/aos.css';
 import { Link } from 'react-router-dom';
 import { FaCheck, FaBolt, FaHeart, FaArrowRight } from 'react-icons/fa';
 import '../styles/AboutPage.css';
+import Faq from '../components/Faq';
+import YourServiceJourney from '../components/YourServiceJourney';
 
 const About = () => {
   useEffect(() => {
@@ -14,6 +16,7 @@ const About = () => {
       mirror: false
     });
   }, []);
+
   return (
     <div className="about-page">
       {/* Hero Section with Animated Gradient */}
@@ -34,6 +37,16 @@ const About = () => {
         </div>
         <div className="hero-pattern"></div>
       </section>
+      {/* FAQ Section */}
+      <section className="faq-section"  data-aos="fade-up">
+        <h1>Frequently Asked Questions</h1>
+        <Faq />
+      </section>
+
+      {/* <section className="faq-section"  data-aos="fade-up">
+        <YourServiceJourney />
+      </section> */}
+
 
       {/* Mission Section with Animated Stats */}
       <section className="mission-section">

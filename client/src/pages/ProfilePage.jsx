@@ -333,7 +333,7 @@ const ProfilePage = () => {
 
   return (
     <div className="profile-container">
-      <div className="profile-header" data-aos="fade-down">
+      <div style={{backgroundColor: 'rgba(67, 97, 238, 0.7)', borderRadius: '10px'}} className="profile-header" data-aos="fade-down">
         {profile.profilePicture && !profileImageError ? (
           <img
             src={getProfilePictureUrl(profile.profilePicture)}
@@ -407,15 +407,15 @@ const ProfilePage = () => {
       )}
 
       {profile.bookings && profile.bookings.length > 0 && (
-          <div className="bookings-section">
-            <h2>My Bookings</h2>
+          <div style={{width: '70vw',padding: '1.5rem'}} className="popular-categories-container bookings-grid">
+            <h1 style={{textShadow: '2px 2px 8px rgba(0, 0, 0, 0.3)'}} className='popular-categories-title'>My Bookings</h1>
             <div className="bookings-list">
-              {profile.bookings.slice(0, showAllBookings ? profile.bookings.length : 4).map((booking, index) => (
+              {profile.bookings.slice(0, showAllBookings ? 8 : 4).map((booking, index) => (
                 <div 
                   key={booking.booking_id} 
                   className="booking-card"
                   data-aos="fade-up"
-                  data-aos-delay={500 + (index * 5)}
+                  data-aos-delay={100}
                 >
                   <div className="booking-header">
                     <h3>{booking.service_title || 'Unknown Service'}</h3>

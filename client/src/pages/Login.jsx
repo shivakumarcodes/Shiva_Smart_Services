@@ -191,10 +191,11 @@ const Login = () => {
               className="modal-content" 
               onClick={(e) => e.stopPropagation()}
               data-aos="zoom-in"
-            >
-              <div className="modal-header">
-                <h3>Select Guest Login Type</h3>
+            >         
+             <div style={{textAlign: 'center',borderRadius: '10px', padding: '1rem'}} className="modal-header">
+                <h3 style={{textAlign: 'center'}}>Select Guest Login Type</h3>
                 <button 
+                  style={{backgroundColor: 'white',color: 'black'}}
                   className="modal-close"
                   onClick={() => setShowGuestModal(false)}
                 >

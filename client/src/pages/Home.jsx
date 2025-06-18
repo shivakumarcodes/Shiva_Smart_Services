@@ -9,6 +9,7 @@ import TestimonialCard from "../components/testimonialCard";
 import HeroBanner from "../components/HeroBanner";
 import '../styles/CategoriesCardsContainer.css';
 import '../styles/Home.css';
+import YourServiceJourney from '../components/YourServiceJourney';
 
 const Home = () => {
     const categories = [
@@ -33,8 +34,10 @@ const Home = () => {
 
   return (
     <div className="home-container" style={{ maxWidth: '1300px'}}>
-      <HeroBanner />
       {/* Hero Section */}
+      <div style={{backgroundColor: '#f0f4f8'}}>
+        <HeroBanner />
+      </div>
       <div 
         className="div-container"
         data-aos="fade-up"
@@ -74,6 +77,8 @@ const Home = () => {
               </div>
             </div>
       </div>
+
+      {/* <YourServiceJourney /> */}
 
       {/* Featured Services */}
       <div data-aos="fade-up" data-aos-delay="100">
