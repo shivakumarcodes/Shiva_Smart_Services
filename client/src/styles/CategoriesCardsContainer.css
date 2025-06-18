@@ -358,6 +358,10 @@
   .Hero-title {
     font-size: 2.5rem;
   }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
 }
 
 @media (max-width: 900px) {

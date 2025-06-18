@@ -22,6 +22,8 @@ const FeaturedServices = memo(() => {
     showRightArrow: true
   });
 
+  const colors = ['#FF6B6B', '#6BCB77', '#4D96FF', '#FFD93D', '#845EC2', '#00C9A7'];
+
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
   const resizeObserverRef = useRef(null);
@@ -172,12 +174,6 @@ const FeaturedServices = memo(() => {
         </div>
 
       <div className="featured-scroll-container relative">
-        {/* Fading Gradient & Arrows */}
-        
-
-        
-
-
         <div
           className="featured-scroll-wrapper"
           ref={scrollContainerRef}
@@ -203,9 +199,10 @@ const FeaturedServices = memo(() => {
             <div className="status-message">No featured providers available</div>
           ) : (
             <div className="featured-scroll-inner">
-              {state.providers.map((provider) => (
+              {state.providers.map((provider, i) => (
                 <FeaturedServiceCard
                   key={provider.provider_id}
+                  index={i}
                   providerPhoto={provider.profile_picture_url}
                   providerName={provider.provider_name}
                   serviceType={provider.service_type}

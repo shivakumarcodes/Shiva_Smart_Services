@@ -22,6 +22,30 @@ const PRICE_RANGE_OPTIONS = [
 
 const ITEMS_PER_PAGE = 8;
 
+// Skeleton Loader Component
+const ServiceCardSkeleton = ({ count = 8 }) => {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, index) => (
+        <article key={index} className="service-card skeleton">
+          <div className="service-image skeleton-image"></div>
+          <div className="service-details">
+            <h2 className="skeleton-text skeleton-title"></h2>
+            <p className="service-provider skeleton-text skeleton-provider"></p>
+            <div className="service-rating skeleton-rating">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} className="skeleton-star">★</span>
+              ))}
+            </div>
+            <p className="service-price skeleton-text skeleton-price"></p>
+            <p className="service-location skeleton-text skeleton-location"></p>
+          </div>
+        </article>
+      ))}
+    </>
+  );
+};
+
 const Services = () => {
   const [allServices, setAllServices] = useState([]);
   const [displayedServices, setDisplayedServices] = useState([]);
@@ -33,11 +57,14 @@ const Services = () => {
     priceRange: ''
   });
 
-  // const BASE_URL = 'http://localhost:5000';
-
   const [categoryOptions, setCategoryOptions] = useState([{ value: '', label: 'All Categories' }]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  
+  const navigate = useNavigate();
+  const debounceRef = useRef(null);
 
-  // Initialize AOS
   useEffect(() => {
     AOS.init({
       duration: 200,
@@ -63,15 +90,6 @@ const Services = () => {
     fetchCategories();
   }, []);
   
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  
-  const navigate = useNavigate();
-  const debounceRef = useRef(null);
-
-  // Parse initial query parameters from URL
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const initialSearch = searchParams.get('search') || '';
@@ -93,7 +111,6 @@ const Services = () => {
         category: filters.category
       };
 
-      // Handle price range if selected
       if (filters.priceRange) {
         const [minPrice, maxPrice] = filters.priceRange.split('-');
         if (minPrice) params.minPrice = parseFloat(minPrice);
@@ -103,12 +120,8 @@ const Services = () => {
       const response = await axios.get(`${BASE_URL}/api/services`, { params });
       const servicesData = response.data.services || [];
       setAllServices(servicesData);
-      
-      // Calculate pagination information
       setTotalItems(servicesData.length);
       setTotalPages(Math.ceil(servicesData.length / ITEMS_PER_PAGE));
-      
-      // Set displayed services for the current page
       updateDisplayedServices(servicesData, 1);
     } catch (err) {
       console.error('Error fetching services:', err);
@@ -121,7 +134,6 @@ const Services = () => {
     }
   };
 
-  // Update displayed services based on current page
   const updateDisplayedServices = (services, page) => {
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -133,7 +145,6 @@ const Services = () => {
     return locations[Math.floor(Math.random() * locations.length)];
   };
 
-  // Effect for page changes
   useEffect(() => {
     if (allServices.length) {
       updateDisplayedServices(allServices, currentPage);
@@ -141,7 +152,6 @@ const Services = () => {
     }
   }, [currentPage, allServices]);
 
-  // Debounced effect for filters
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -285,7 +295,6 @@ const Services = () => {
   return (
     <div className="services-page">
       <div className="services-browser-container">
-        {/* Doodle background elements */}
         <div className="doodle-bg">
           {[...Array(20)].map((_, i) => (
             <div 
@@ -346,9 +355,6 @@ const Services = () => {
           <div className="filters-section" data-aos="fade-up" data-aos-delay="200">
             <div className="filter-group" data-aos="zoom-in" data-aos-delay="250">
               <label htmlFor="category-filter" className="filter-label">
-                {/* <svg className="filter-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4.25 5.61C6.27 8.2 10 13 10 13V19C10 19.55 10.45 20 11 20H13C13.55 20 14 19.55 14 19V13C14 13 17.72 8.2 19.74 5.61C20.25 4.95 19.78 4 18.95 4H5.04C4.21 4 3.74 4.95 4.25 5.61Z" fill="currentColor"/>
-                </svg> */}
                 Category
               </label>
               <select
@@ -367,9 +373,6 @@ const Services = () => {
             
             <div className="filter-group" data-aos="zoom-in" data-aos-delay="300">
               <label htmlFor="price-filter" className="filter-label">
-                {/* <svg className="filter-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M11.8 10.9C9.53 10.31 8.8 9.7 8.8 8.75C8.8 7.66 9.81 6.9 11.5 6.9C13.28 6.9 13.94 7.75 14 9H16.21C16.14 7.28 15.09 5.7 12.5 5.19V3H10.5V5.16C8.06 5.58 6.5 6.84 6.5 8.77C6.5 11.08 8.41 12.23 11.2 12.9C13.7 13.5 14.2 14.38 14.2 15.31C14.2 16 13.71 17.1 11.5 17.1C9.44 17.1 8.63 16.18 8.5 15H6.29C6.43 17.19 8.08 18.42 10.5 18.83V21H12.5V18.85C14.96 18.48 16.5 17.35 16.5 15.3C16.5 12.46 14.07 11.49 11.8 10.9Z" fill="currentColor"/>
-                </svg> */}
                 Price Range
               </label>
               <select
@@ -389,14 +392,11 @@ const Services = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div className="loading" aria-live="polite" data-aos="fade-in">
-          <div className="loading-spinner"></div>
-          Loading services...
-        </div>
-      ) : (
-        <>        
-          <div className="service-grid">
+      <div className="service-grid">
+        {loading ? (
+          <ServiceCardSkeleton count={ITEMS_PER_PAGE} />
+        ) : (
+          <>
             {displayedServices.length > 0 ? (
               displayedServices.map((service, index) => (
                 <article 
@@ -408,7 +408,6 @@ const Services = () => {
                   aria-label={`Service: ${service.title}`}
                   onKeyDown={(e) => e.key === 'Enter' && handleServiceClick(service.service_id)}
                   data-aos="fade-up"
-                  // data-aos-delay={index % 8 * 50}
                 >
                   <div className="service-image">
                     <img 
@@ -436,11 +435,11 @@ const Services = () => {
                 No services found matching your criteria.
               </p>
             )}
-          </div>
-          
-          {renderPagination()}
-        </>
-      )}
+          </>
+        )}
+      </div>
+      
+      {!loading && renderPagination()}
     </div>
   );
 };

@@ -7,10 +7,12 @@
   overflow: hidden;
   margin-bottom: 30px;
   border-radius: 15px;
+  border: #fff 2px solid;
 }
 
 .featured-title {
   color: white;
+  text-shadow: #111827 0 5px 15px rgba(0, 0, 0, 0.3);
   font-size: clamp(1.75rem, 5vw, 2.75rem);
   text-align: center;
   font-weight: 700;
@@ -31,11 +33,12 @@
 .featured-scroll-wrapper {
   overflow-x: auto;
   scroll-behavior: smooth;
-  padding-inline: 1rem;
+  padding-inline: 2rem;
   -webkit-overflow-scrolling: touch;
   position: relative;
   width: 100%;
   scroll-snap-type: x proximity;
+  margin-left: 20px;
 }
 
 /* Hide scrollbar for all browsers */

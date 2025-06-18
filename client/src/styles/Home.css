@@ -272,8 +272,14 @@
 
 .testimonials-section{
   padding: 4rem;
-  background-color: lightblue;
+  background-color: rgb(125, 115, 115);
+  background-image: url("https://www.10000coders.in/_next/image?url=%2FIndustrySays%2Fmern.webp&w=3840&q=75");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; 
   border-radius: 15px;
+  border: white 2px solid;
 }
 
 .div-container {

@@ -88,7 +88,7 @@ const Home = () => {
       {/* Testimonials Section */}
       <div className="testimonials-section">
         <h1 
-          className="categories-title"
+          className="featured-title"
           data-aos="fade-up"
           data-aos-delay="50"
         >

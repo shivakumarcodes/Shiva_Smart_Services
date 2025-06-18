@@ -1,8 +1,10 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import '../styles/FeaturedServiceCard.css';
 
+const colors = ['#FF6B6B', '#6BCB77', '#4D96FF', '#FFD93D', '#845EC2', '#00C9A7'];
+
 const FeaturedServiceCard = ({
+  index,
   providerPhoto = '',
   providerName,
   serviceType,
@@ -65,7 +67,7 @@ const FeaturedServiceCard = ({
       aria-label={`View details for ${providerName}, ${serviceType} provider`}
     >
       <div className="provider-photo-wrapper">
-        <div className="provider-photo-bg">
+        <div style={{ backgroundColor: colors[index],borderRadius: '0' }} className="provider-photo-bg">
           <img
             src={providerPhoto || 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg'}
             alt={`${providerName}`}
