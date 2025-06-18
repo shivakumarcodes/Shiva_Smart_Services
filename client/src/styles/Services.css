@@ -301,7 +301,7 @@
   width: 100%;
 }
 
-@media (min-width: 1000px) and (max-width: 1290px) {
+@media (min-width: 1260px) and (max-width: 1290px) {
   .services-page .service-grid {
     grid-template-columns: repeat(4, 1fr);
   }
