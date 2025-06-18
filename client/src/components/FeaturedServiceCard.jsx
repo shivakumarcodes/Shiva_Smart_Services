@@ -64,25 +64,26 @@ const FeaturedServiceCard = ({
       role="button"
       aria-label={`View details for ${providerName}, ${serviceType} provider`}
     >
-      <div className="provider-photo-container">
-        <img
-          src={providerPhoto || 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg'}
-          alt={`${providerName}`}
-          className="provider-photo"
-          loading="lazy"
-          onError={(e) => {
-            e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
-            e.target.alt = 'Default provider avatar';
-          }}
-        />
+      <div className="provider-photo-wrapper">
+        <div className="provider-photo-bg">
+          <img
+            src={providerPhoto || 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg'}
+            alt={`${providerName}`}
+            className="provider-photo"
+            loading="lazy"
+            onError={(e) => {
+              e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
+              e.target.alt = 'Default provider avatar';
+            }}
+          />
+        </div>
       </div>
+
       <div className="provider-info">
         <h3 className="provider-name">{providerName}</h3>
         <p className="provider-category">{serviceType}</p>
         {renderStars(rating)}
-        <div className="experience-info">
-          {experience_years} years of experience
-        </div>
+        <p className="experience-info">{experience_years} years of experience</p>
       </div>
     </article>
   );
