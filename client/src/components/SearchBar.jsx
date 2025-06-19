@@ -3,34 +3,47 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/SearchBar.css';
 
 export default function SearchBar() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [location, setLocation] = useState('');
+  const [form, setForm] = useState({ searchTerm: '', location: '' });
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
-    // Navigate to services page with query parameters that match the Services component's filter structure
-    navigate(`/services?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`);
+    const { searchTerm, location } = form;
+
+    const trimmedSearch = searchTerm.trim();
+    const trimmedLocation = location.trim();
+
+    // Prevent empty submissions if both fields are blank
+    if (!trimmedSearch && !trimmedLocation) return;
+
+    navigate(
+      `/services?search=${encodeURIComponent(trimmedSearch)}&location=${encodeURIComponent(trimmedLocation)}`
+    );
   };
 
   return (
     <div className="search-bar-container">
-      <form onSubmit={handleSearch} className="search-bar-form">
+      <form onSubmit={handleSearch} className="search-bar-form" aria-label="Search services by category and location">
         <div className="search-input-group">
-          <label htmlFor="service" className="search-label">
+          <label htmlFor="searchTerm" className="search-label">
             What service do you need?
           </label>
           <input
             type="text"
-            id="service"
+            id="searchTerm"
+            name="searchTerm"
             placeholder="e.g. Cleaning, Plumbing"
             className="search-input"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={form.searchTerm}
+            onChange={handleChange}
           />
         </div>
-        
+
         <div className="search-input-group">
           <label htmlFor="location" className="search-label">
             Where?
@@ -38,18 +51,16 @@ export default function SearchBar() {
           <input
             type="text"
             id="location"
+            name="location"
             placeholder="e.g. Hyderabad, Siddipet"
             className="search-input"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            value={form.location}
+            onChange={handleChange}
           />
         </div>
-        
+
         <div className="search-button-container">
-          <button
-            type="submit"
-            className="search-button"
-          >
+          <button type="submit" className="search-button">
             Search
           </button>
         </div>

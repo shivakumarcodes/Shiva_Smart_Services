@@ -1,34 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CategoryCard from './CategoryCard';
 import '../styles/CategoriesCardsContainer.css';
-import { useNavigate } from 'react-router-dom';
 
 export default function Categories() {
   const navigate = useNavigate();
-  const categories = [
+
+  const categories = useMemo(() => [
     { name: 'Cleaning', icon: '🧹' },
     { name: 'Photography', icon: '📷' },
     { name: 'Plumbing', icon: '🚿' },
     { name: 'Electrical', icon: '💡' }
-  ];
+  ], []);
 
   const handleCategoryClick = (categoryName) => {
-    navigate(`/categories/${categoryName.toLowerCase().replace(/\s+/g, '-')}`);
+    const slug = encodeURIComponent(categoryName.toLowerCase().replace(/\s+/g, '-'));
+    navigate(`/categories/${slug}`);
   };
 
   return (
-    <div className="div-container">
-      <h2 className="categories-title">Popular Categories</h2>
-      <div className="categories-grid">
+    <section className="div-container" aria-labelledby="popular-categories-title">
+      <h2 id="popular-categories-title" className="categories-title">
+        Popular Categories
+      </h2>
+
+      <nav className="categories-grid" role="navigation" aria-label="Browse categories">
         {categories.map((category, index) => (
-          <CategoryCard 
-            key={index} 
-            name={category.name} 
-            onClick={() => handleCategoryClick(category.name)} 
-            icon={category.icon} 
+          <CategoryCard
+            key={index}
+            name={category.name}
+            icon={category.icon}
+            onClick={() => handleCategoryClick(category.name)}
           />
         ))}
-      </div>
-    </div>
+      </nav>
+    </section>
   );
 }

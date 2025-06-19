@@ -1,7 +1,9 @@
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import '../styles/FeaturedServiceCard.css';
 
 const colors = ['#FF6B6B', '#6BCB77', '#4D96FF', '#FFD93D', '#845EC2', '#00C9A7'];
+const fallbackImg = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
 
 const FeaturedServiceCard = ({
   index,
@@ -29,7 +31,10 @@ const FeaturedServiceCard = ({
     const hasHalfStar = numericRating % 1 >= 0.5;
 
     return (
-      <div className="provider-rating" aria-label={`Rating: ${numericRating.toFixed(1)} out of 5`}>
+      <div
+        className="provider-rating"
+        aria-label={`Rating: ${numericRating.toFixed(1)} out of 5`}
+      >
         {[...Array(5)].map((_, i) => {
           if (i < fullStars) {
             return <span key={i} className="star filled">★</span>;
@@ -64,17 +69,21 @@ const FeaturedServiceCard = ({
       onKeyDown={handleKeyDown}
       tabIndex="0"
       role="button"
+      aria-pressed="false"
       aria-label={`View details for ${providerName}, ${serviceType} provider`}
     >
       <div className="provider-photo-wrapper">
-        <div style={{ backgroundColor: colors[index],borderRadius: '0' }} className="provider-photo-bg">
+        <div
+          style={{ backgroundColor: colors[index % colors.length], borderRadius: '0' }}
+          className="provider-photo-bg"
+        >
           <img
-            src={providerPhoto || 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg'}
-            alt={`${providerName}`}
+            src={providerPhoto || fallbackImg}
+            alt={providerPhoto ? `${providerName}` : 'Default provider avatar'}
             className="provider-photo"
             loading="lazy"
             onError={(e) => {
-              e.target.src = 'https://isobarscience.com/wp-content/uploads/2020/09/default-profile-picture1.jpg';
+              e.target.src = fallbackImg;
               e.target.alt = 'Default provider avatar';
             }}
           />
@@ -92,6 +101,7 @@ const FeaturedServiceCard = ({
 };
 
 FeaturedServiceCard.propTypes = {
+  index: PropTypes.number.isRequired,
   providerPhoto: PropTypes.string,
   providerName: PropTypes.string.isRequired,
   serviceType: PropTypes.string.isRequired,
@@ -101,4 +111,4 @@ FeaturedServiceCard.propTypes = {
   isLoading: PropTypes.bool
 };
 
-export default FeaturedServiceCard;
+export default memo(FeaturedServiceCard);

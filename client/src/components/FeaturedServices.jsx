@@ -19,15 +19,16 @@ const FeaturedServices = memo(() => {
     loading: true,
     error: null,
     showLeftArrow: false,
-    showRightArrow: true
+    showRightArrow: false,
+    hasOverflow: false
   });
 
   const colors = ['#FF6B6B', '#6BCB77', '#4D96FF', '#FFD93D', '#845EC2', '#00C9A7'];
 
   const scrollContainerRef = useRef(null);
+  const contentRef = useRef(null);
   const navigate = useNavigate();
   const resizeObserverRef = useRef(null);
-  const scrollDebounceTimerRef = useRef(null);
 
   const fetchFeaturedProviders = useCallback(async () => {
     const source = axios.CancelToken.source();
@@ -51,7 +52,6 @@ const FeaturedServices = memo(() => {
           loading: false
         }));
       }
-      // console.log('Featured providers fetched:', response.data);
     } catch (err) {
       if (!axios.isCancel(err)) {
         console.error('Error fetching featured providers:', err);
@@ -68,36 +68,53 @@ const FeaturedServices = memo(() => {
 
   useEffect(() => {
     fetchFeaturedProviders();
-
-    return () => {
-      if (scrollDebounceTimerRef.current) {
-        clearTimeout(scrollDebounceTimerRef.current);
-      }
-    };
   }, [fetchFeaturedProviders]);
 
-  const updateScrollArrows = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+  const checkOverflow = useCallback(() => {
     const container = scrollContainerRef.current;
+    const content = contentRef.current;
+    if (!container || !content) return;
+
+    const hasOverflow = content.scrollWidth > container.clientWidth;
+
+    setState(prev => ({
+      ...prev,
+      hasOverflow,
+      showLeftArrow: false,
+      showRightArrow: hasOverflow
+    }));
+  }, []);
+
+  const updateScrollArrows = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
     const { scrollLeft, scrollWidth, clientWidth } = container;
 
     setState(prev => ({
       ...prev,
       showLeftArrow: scrollLeft > 0,
-      showRightArrow: scrollLeft < scrollWidth - clientWidth - 1
+      showRightArrow: prev.hasOverflow && scrollLeft < scrollWidth - clientWidth - 1
     }));
   }, []);
 
-  const debouncedUpdateScrollArrows = useCallback(
-    debounce(updateScrollArrows, 100),
-    [updateScrollArrows]
-  );
+  const debouncedUpdateScrollArrows = useCallback(debounce(updateScrollArrows, 100), [updateScrollArrows]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    resizeObserverRef.current = new ResizeObserver(debouncedUpdateScrollArrows);
+    if (!state.loading && state.providers.length > 0) {
+      setTimeout(() => {
+        checkOverflow();
+        updateScrollArrows();
+      }, 0);
+    }
+
+    resizeObserverRef.current = new ResizeObserver(() => {
+      checkOverflow();
+      debouncedUpdateScrollArrows();
+    });
     resizeObserverRef.current.observe(container);
 
     const handleScroll = throttle(() => {
@@ -105,7 +122,6 @@ const FeaturedServices = memo(() => {
     }, 50);
 
     container.addEventListener('scroll', handleScroll);
-    updateScrollArrows(); // initial check
 
     return () => {
       if (resizeObserverRef.current) {
@@ -113,13 +129,13 @@ const FeaturedServices = memo(() => {
       }
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [debouncedUpdateScrollArrows, updateScrollArrows]);
+  }, [state.loading, state.providers.length, checkOverflow, debouncedUpdateScrollArrows, updateScrollArrows]);
 
   const scroll = useCallback((direction) => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    const scrollAmount = container.clientWidth * 0.8;
 
+    const scrollAmount = container.clientWidth * 0.8;
     container.scrollTo({
       left: direction === 'left'
         ? container.scrollLeft - scrollAmount
@@ -151,33 +167,34 @@ const FeaturedServices = memo(() => {
         Featured Service Providers
       </h2>
 
-      <div className={`featured-scroll-fade-left ${state.showLeftArrow ? 'visible' : 'hidden'}`}>
+      {state.showLeftArrow && (
+        <div className="featured-scroll-fade-left visible">
           <button
             className="scroll-button left"
             onClick={() => scroll('left')}
             aria-label="Scroll left"
-            disabled={!state.showLeftArrow}
           >
             <FaChevronLeft />
           </button>
         </div>
+      )}
 
-        <div className={`featured-scroll-fade-right ${state.showRightArrow ? 'visible' : 'hidden'}`}>
+      {state.showRightArrow && (
+        <div className="featured-scroll-fade-right visible">
           <button
             className="scroll-button right"
             onClick={() => scroll('right')}
             aria-label="Scroll right"
-            disabled={!state.showRightArrow}
           >
             <FaChevronRight />
           </button>
         </div>
+      )}
 
       <div className="featured-scroll-container relative">
         <div
           className="featured-scroll-wrapper"
           ref={scrollContainerRef}
-          id="featured-services-scroll"
           role="region"
           aria-label="Featured services carousel"
           tabIndex="0"
@@ -198,7 +215,7 @@ const FeaturedServices = memo(() => {
           ) : state.providers.length === 0 ? (
             <div className="status-message">No featured providers available</div>
           ) : (
-            <div className="featured-scroll-inner">
+            <div className="featured-scroll-inner" ref={contentRef}>
               {state.providers.map((provider, i) => (
                 <FeaturedServiceCard
                   key={provider.provider_id}

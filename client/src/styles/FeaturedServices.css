@@ -39,6 +39,7 @@
   width: 100%;
   scroll-snap-type: x proximity;
   margin-left: 20px;
+  margin-right: 20px;
 }
 
 /* Hide scrollbar for all browsers */
@@ -94,44 +95,72 @@
   outline-offset: 2px;
 }
 
-.scroll-button.left {
-  left: 10px;
-}
-
-.scroll-button.right {
-  right: 10px;
-}
-
 .scroll-button svg {
   font-size: 1.2rem;
 }
 
-/* Fading gradient overlays */
+/* Fading gradient overlays (visible when scrolling is possible) */
 .featured-scroll-fade-left,
 .featured-scroll-fade-right {
   position: absolute;
   top: 0;
-  width: 60px;
+  width: 40px;
   height: 100%;
   z-index: 10;
-  pointer-events: none;
+  pointer-events: none; /* So only the button inside is clickable */
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-.featured-scroll-wrapper:hover .featured-scroll-fade-left,
-.featured-scroll-wrapper:hover .featured-scroll-fade-right {
+/* Show gradient + button when active (via JS class toggle) */
+.featured-scroll-fade-left.visible,
+.featured-scroll-fade-right.visible {
   opacity: 1;
+  pointer-events: auto; /* Enable clicking on buttons when visible */
 }
 
+/* Left gradient */
 .featured-scroll-fade-left {
   left: 0;
-  background: linear-gradient(to right, rgba(21, 37, 79, 0.9) 0%, rgba(21, 37, 79, 0) 100%);
+  background: linear-gradient(
+    to right,
+    rgba(21, 37, 79, 0.9) 0%,
+    rgba(21, 37, 79, 0) 100%
+  );
 }
 
+/* Right gradient */
 .featured-scroll-fade-right {
-  right: 0;
-  background: linear-gradient(to left, rgba(21, 107, 86, 0.9) 0%, rgba(21, 107, 86, 0) 100%);
+  right: 0; /* <- FIXED: it was `-4`, which is invalid */
+  background: linear-gradient(
+    to left,
+    rgba(21, 107, 86, 0.9) 0%,
+    rgba(21, 107, 86, 0) 100%
+  );
+}
+
+/* Scroll buttons inside the fades */
+.scroll-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+}
+
+.scroll-button.left {
+  left: 8px;
+}
+
+.scroll-button.right {
+  right: 8px;
 }
 
 .status-message {
@@ -292,11 +321,6 @@
     width: 36px;
     height: 36px;
     opacity: 0.8;
-  }
-  
-  .featured-scroll-fade-left,
-  .featured-scroll-fade-right {
-    width: 40px;
   }
   
   .featured-section {
