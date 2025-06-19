@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { FaCheck, FaBolt, FaHeart, FaArrowRight } from 'react-icons/fa';
 import '../styles/AboutPage.css';
 import Faq from '../components/Faq';
-import YourServiceJourney from '../components/YourServiceJourney';
+// import YourServiceJourney from '../components/YourServiceJourney';
 
 const About = () => {
   useEffect(() => {

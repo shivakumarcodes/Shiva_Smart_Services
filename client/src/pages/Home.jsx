@@ -10,7 +10,7 @@ import '../styles/Home.css';
 // Lazy-loaded components
 const FeaturedServices = lazy(() => import('../components/FeaturedServices'));
 const TestimonialCard = lazy(() => import('../components/TestimonialCard'));
-// const YourServiceJourney = lazy(() => import('../components/YourServiceJourney'));
+const WhatsApp = lazy(() => import('../components/WhatsApp'));
 
 const Home = () => {
   const categories = [
@@ -21,7 +21,7 @@ const Home = () => {
   ];
 
   useEffect(() => {
-    setTimeout(() => {
+    const initAOS = setTimeout(() => {
       AOS.init({
         duration: 800,
         easing: 'ease-in-out',
@@ -29,11 +29,13 @@ const Home = () => {
         offset: 100
       });
       AOS.refresh();
-    }, 1000); // Delay by 1s
+    }, 1000);
+    
+    return () => clearTimeout(initAOS); // Cleanup timeout
   }, []);
 
   return (
-    <div className="home-container" style={{ maxWidth: '1300px', margin: '0 auto' }}>
+    <div className="home-container" style={{ maxWidth: '1300px', margin: '0 auto', position: 'relative' }}>
       {/* Hero Section */}
       <div style={{ backgroundColor: '#f0f4f8' }}>
         <HeroBanner />
@@ -67,31 +69,29 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Service Journey Section (Lazy) */}
-      {/* <Suspense fallback={<div style={{ textAlign: 'center' }}>Loading Journey...</div>}>
-        <div data-aos="fade-up" data-aos-delay="80">
-          <YourServiceJourney />
-        </div>
-      </Suspense> */}
-
-      {/* Featured Services Section (Lazy) */}
-      <Suspense fallback={<div style={{ textAlign: 'center' }}>Loading Featured Services...</div>}>
+      {/* Featured Services Section */}
+      <Suspense fallback={<div className="loading-placeholder">Loading Featured Services...</div>}>
         <div data-aos="fade-up" data-aos-delay="100">
           <FeaturedServices />
         </div>
       </Suspense>
 
-      {/* Testimonials Section (Lazy) */}
+      {/* Testimonials Section */}
       <div className="testimonials-section">
         <h1 className="featured-title" data-aos="fade-up" data-aos-delay="50">
           What our users say
         </h1>
-        <Suspense fallback={<div style={{ textAlign: 'center' }}>Loading Testimonials...</div>}>
+        <Suspense fallback={<div className="loading-placeholder">Loading Testimonials...</div>}>
           <div data-aos="fade-up" data-aos-delay="100">
             <TestimonialCard />
           </div>
         </Suspense>
       </div>
+
+      {/* WhatsApp Floating Button */}
+      <Suspense fallback={null}> {/* No fallback needed for floating button */}
+        <WhatsApp />
+      </Suspense>
     </div>
   );
 };
