@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import '../styles/TestimonialCard.css';
 
-const TestimonialCard = () => {
+const Testimonial = () => {
   return (
     <figure className="testimonial-card" aria-label="User testimonial">
       <div className="quote-curve" aria-hidden="true">
@@ -38,4 +38,4 @@ const TestimonialCard = () => {
   );
 };
 
-export default memo(TestimonialCard);
+export default memo(Testimonial);

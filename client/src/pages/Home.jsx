@@ -9,7 +9,7 @@ import '../styles/Home.css';
 
 // Lazy-loaded components
 const FeaturedServices = lazy(() => import('../components/FeaturedServices'));
-const TestimonialCard = lazy(() => import('../components/TestimonialCard'));
+const Testimonial = lazy(() => import('../components/Testimonial'));
 const WhatsApp = lazy(() => import('../components/WhatsApp'));
 
 const Home = () => {
@@ -83,7 +83,7 @@ const Home = () => {
         </h1>
         <Suspense fallback={<div className="loading-placeholder">Loading Testimonials...</div>}>
           <div data-aos="fade-up" data-aos-delay="100">
-            <TestimonialCard />
+            <Testimonial />
           </div>
         </Suspense>
       </div>
